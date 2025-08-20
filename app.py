@@ -73,6 +73,11 @@ def get_usd_eur_rate():
         print("Exchange rate fetch error:", e)
         return 0.92  # fallback to a reasonable default
 
+# Initialize the database
+@app.route('/init-db')
+def init_db():
+    db.create_all()
+    return "Database initialized!"
 
 @app.route('/')
 def index():
