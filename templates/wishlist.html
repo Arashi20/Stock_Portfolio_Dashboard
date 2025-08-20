@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Wishlist</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    {% include 'sidebar.html' %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <ul class="flashes">
+        {% for category, message in messages %}
+        <li class="flash-{{ category }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+    <header>
+        <h1 style="color: #1E3A34;">Wishlist</h1>
+        <p style="color: #C1A14A;">"Desire is the starting point of all achievement, not a hope, not a wish, but a keen pulsating desire which transcends everything." —Napoleon Hill</p>
+    </header>
+    <section>
+        <h2>Add to Wishlist</h2>
+        <form method="post" action="{{ url_for('wishlist_page') }}" class="report-form">
+            <label><strong>Ticker:</strong>
+                <input type="text" name="ticker" required class="beige-input">
+            </label><br>
+            <label><strong>Desired Price:</strong>
+                <input type="number" name="desired_price" step="any" min="0" required class="beige-input">
+            </label><br>
+            <label><strong>Currency:</strong>
+                <select name="currency" required class="beige-input" style="background: #F8F5F0; border: 1px solid #D6C6B9; color: #2C2C2C;">
+                    <option value="EUR">EUR (€)</option>
+                    <option value="USD">USD ($)</option>
+                </select>
+            </label><br>
+            <button type="submit"><strong>Add</strong></button>
+        </form>
+    </section>
+    <section>
+        <h2>My Wishlist</h2>
+        <table style="background: #F8F5F0; border-collapse: collapse; width: 100%;">
+            <thead style="background: #1E3A34; color: #F8F5F0; font-family: 'Georgia', serif; font-variant: small-caps; font-weight: bold;">
+                <tr>
+                    <th style="padding: 0.5rem;">Ticker</th>
+                    <th style="padding: 0.5rem;">Desired Price</th>
+                    <th style="padding: 0.5rem;">Report(s)</th>
+                    <th style="padding: 0.5rem;">Actions</th>
+                </tr>
+            </thead>
+            <tbody style="color: #2C2C2C;">
+                {% if wishlist %}
+                {% for item in wishlist %}
+                <tr style="border-bottom: 1px solid #D6C6B9;">
+                    <td style="padding: 0.5rem;">{{ item.ticker }}</td>
+                    <td style="padding: 0.5rem;">
+                        {% if item.currency == 'EUR' %}
+                        €{{ "%.2f"|format(item.desired_price) }}
+                        {% else %}
+                        ${{ "%.2f"|format(item.desired_price) }}
+                        {% endif %}
+                    </td>
+                    <td style="padding: 0.5rem;">
+                        <a href="{{ url_for('reports_page') }}?search={{ item.ticker }}"
+                            style="color:#3b5d3a; text-decoration:underline;">
+                            View Report(s)
+                        </a>
+                    </td>
+                    <td style="padding: 0.5rem;">
+                        <a href="/wishlist/delete/{{ item.id }}" class="delete-link" data-ticker="{{ item.ticker }}" 
+                            style="color: #880D11; text-decoration: underline;">
+                            Delete
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="4" style="text-align:center; color:#2e2e1f; font-weight:bold;">
+                        Your wishlist is empty. Add items to start tracking!
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Delete Modal -->
+    <div id="deleteModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="modal-close" id="modalClose">&times;</span>
+            <h2>Confirm Deletion</h2>
+            <p id="modalText">Are you sure you want to delete this wishlist item?</p>
+            <button id="modalCancel" class="modal-btn cancel-btn">Cancel</button>
+            <button id="modalConfirm" class="modal-btn confirm-btn">Delete</button>
+        </div>
+    </div>
+
+    <script>
+        // Modal logic for delete confirmation
+        const deleteLinks = document.querySelectorAll('.delete-link');
+        const modal = document.getElementById('deleteModal');
+        const modalText = document.getElementById('modalText');
+        const modalClose = document.getElementById('modalClose');
+        const modalCancel = document.getElementById('modalCancel');
+        const modalConfirm = document.getElementById('modalConfirm');
+        let deleteUrl = '';
+
+        deleteLinks.forEach(function (link) {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                deleteUrl = this.getAttribute('href');
+                const ticker = this.getAttribute('data-ticker');
+                modalText.textContent = `Are you sure you want to delete the wishlist item for "${ticker}"?`;
+                modal.style.display = 'flex';
+            });
+        });
+
+        function closeModal() {
+            modal.style.display = 'none';
+            deleteUrl = '';
+        }
+
+        modalClose.onclick = closeModal;
+        modalCancel.onclick = closeModal;
+
+        modalConfirm.onclick = function () {
+            if (deleteUrl) {
+                window.location.href = deleteUrl;
+            }
+        };
+
+        // Close modal when clicking outside the modal content
+        window.onclick = function (event) {
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+    </script>
+
+    <script>
+        // Auto-dismiss flash messages after 3 seconds
+        setTimeout(function () {
+            document.querySelectorAll('.flashes li').forEach(function (el) {
+                el.classList.add('hide');
+            });
+            setTimeout(function () {
+                var flashes = document.querySelector('.flashes');
+                if (flashes) {
+                    flashes.remove();
+                }
+            }, 600);
+        }, 3000);
+    </script>
+
+    <a href="{{ url_for('index') }}" class="back-link" style="display: inline-block; margin-top: 20px; padding: 10px 15px; background: #1E3A34; color: #F8F5F0; text-decoration: none; border-radius: 4px;">← Back to Dashboard</a>
+
+</body>
+
+</html>

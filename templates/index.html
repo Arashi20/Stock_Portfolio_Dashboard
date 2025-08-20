@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Stock Dashboard Arash</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    {% include 'sidebar.html' %}
+    <header>
+        <h1>Welcome back, Arash</h1>
+        <p>"The best investment you can make is in yourself." —Warren Buffett</p>
+    </header>
+
+    <section id="portfolio-overview">
+        <h2>Quick Portfolio Overview</h2>
+        <table style="background: #F8F5F0; border-collapse: collapse; width: 100%;">
+            <thead style="background: #1E3A34; color: #F8F5F0; font-family: 'Georgia', serif; font-variant: small-caps; font-weight: bold;">
+                <tr>
+                    <th style="padding: 0.5rem;">Ticker</th>
+                    <th style="padding: 0.5rem;">Price</th>
+                    <th style="padding: 0.5rem;">Shares</th>
+                </tr>
+            </thead>
+            <tbody style="color: #2C2C2C;">
+                {% for stock in portfolio %}
+                <tr style="border-bottom: 1px solid #D6C6B9;">
+                    <td style="padding: 0.5rem;">{{ stock.ticker }}</td>
+                    <td style="padding: 0.5rem;">
+                        {% if stock.price is not none %}
+                        {% if stock.currency == 'EUR' %}
+                        €{{ "%.2f"|format(stock.price) }}
+                        {% else %}
+                        ${{ "%.2f"|format(stock.price) }}
+                        {% endif %}
+                        {% else %}
+                        N/A
+                        {% endif %}
+                    </td>
+                    <td style="padding: 0.5rem;">{{ stock.shares }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <section id="navigation-links" class="center">
+        <div class="nav-card" style="background: #F7F7F7; border-radius: 8px; padding: 1rem; margin: 1rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+            <a href="{{ url_for('portfolio_page') }}" style="color: #3B5D3A; text-decoration: none; font-weight: bold;">
+                Portfolio</a>
+        </div>
+        <div class="nav-card" style="background: #F7F7F7; border-radius: 8px; padding: 1rem; margin: 1rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+            <a href="{{ url_for('dcf') }}" style="color: #3B5D3A; text-decoration: none; font-weight: bold;"> DCF
+                Calculator</a>
+        </div>
+        <div class="nav-card" style="background: #F7F7F7; border-radius: 8px; padding: 1rem; margin: 1rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+            <a href="{{ url_for('wishlist_page') }}" style="color: #3B5D3A; text-decoration: none; font-weight: bold;">
+                Wishlist</a>
+        </div>
+        <div class="nav-card" style="background: #F7F7F7; border-radius: 8px; padding: 1rem; margin: 1rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+            <a href="{{ url_for('reports_page') }}" style="color: #3B5D3A; text-decoration: none; font-weight: bold;">
+                My Reports</a>
+        </div>
+    </section>
+</body>
+
+</html>

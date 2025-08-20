@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Holding</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    {% include 'sidebar.html' %}
+    <header>
+        <h1 style="color: #1E3A34;">Edit Holding</h1>
+    </header>
+    <section>
+        <form method="post" class="report-form">
+            <label><strong>Ticker:</strong>
+                <input type="text" name="ticker" value="{{ holding.ticker }}" required class="beige-input">
+            </label><br>
+            <label><strong>Shares:</strong>
+                <input type="number" name="shares" value="{{ holding.shares }}" step="any" min="0" required class="beige-input">
+            </label><br>
+            <label><strong>Average Price:</strong>
+                <input type="number" name="avg_price" value="{{ holding.avg_price }}" step="any" min="0" required
+                    class="beige-input">
+            </label><br>
+            <label><strong>Currency:</strong>
+                <select name="currency" required class="beige-input">
+                    <option value="EUR" {% if holding.currency=='EUR' %}selected{% endif %}>EUR</option>
+                    <option value="USD" {% if holding.currency=='USD' %}selected{% endif %}>USD</option>
+                </select>
+            </label><br>
+            <button type="submit"><strong>Update Holding</strong></button>
+        </form>
+    </section>
+    <a href="{{ url_for('portfolio_page') }}" class="back-link">← Back to Portfolio</a>
+</body>
+
+</html>

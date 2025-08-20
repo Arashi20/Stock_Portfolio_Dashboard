@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>DCF Calculator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    {% include 'sidebar.html' %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <ul class="flashes">
+        {% for category, message in messages %}
+        <li class="flash-{{ category }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+    <header>
+        <h1 style="color: #1E3A34;">DCF Calculator</h1>
+        <p style="color: #C1A14A;">"A great business at a fair price is superior to a fair business at a great price." -
+            Charlie Munger</p>
+        <div style="
+        background: #f5f3e7;
+        border: 1px solid #b5a77a;
+        border-radius: 8px;
+        color: #2e2e1f;
+        padding: 1rem 1.5rem;
+        margin: 3rem auto 4rem auto;
+        display: block;
+        max-width: 900px;
+        font-size: 1rem;
+        text-align: left;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        
+        
+    ">
+            <strong>How to use the DCF Calculator:</strong>
+            <ul style="margin-top:0.5rem;">
+                <li><strong>Ticker:</strong> Enter the stock symbol (e.g., AAPL, MSFT).</li>
+                <li>
+                    <strong>Free Cash Flow (M/B):</strong>
+                    Enter the company’s (average) annual free cash flow in millions or
+                    billions.
+                    <br>
+                    <a href="https://stockanalysis.com/stocks/amd/financials" target="_blank"
+                        style="color:#3b5d3a; background:#e6e2d3; padding:2px 8px; border-radius:4px; text-decoration:underline; font-size:0.95em; display:inline-block; margin-top:4px;">
+                        Example: StockAnalysis Financials
+                    </a>
+                </li>
+                <li><strong>Growth Rates:</strong> Estimate the company’s growth rate for years 1-5 and 6-10 (as
+                    percentages).</li>
+                <li><strong>Discount Rate:</strong> Enter your required rate of return (usually 8-12%).</li>
+                <li><strong>Terminal Growth Rate:</strong> Estimate long-term growth after year 10 (usually 2-3%). Make sure it is greater than the terminal growth rate.</li>
+                <li><strong>Shares Outstanding (M/B):</strong> Enter the total shares outstanding in millions or
+                    billions. (Must be greater than zero.)</li>
+                <li>Click <strong>Calculate</strong> to see the intrinsic value per share. Click <strong>Save
+                        Analysis</strong> to store your result.</li>
+                <li>Use <strong>Create Report</strong> to generate a detailed report from your saved DCF analysis.</li>
+            </ul>
+            <div style="margin-top:0.5rem; color:#3b5d3a;">
+                <em>Tip: FCF and Shares Outstanding inputs must be positive numbers. For best results, use recent
+                    financial statements and
+                    realistic growth assumptions.</em>
+            </div>
+        </div>
+    </header>
+
+    <form method="post">
+        <label><strong>Ticker:</strong>
+            <input type="text" name="ticker" required class="beige-input" value="{{ form_data.ticker or '' }}">
+        </label><br>
+        <label><strong>Free Cash Flow (M/B):</strong>
+            <input type="number" name="fcf" step="0.01" min="0" required class="beige-input"
+                value="{{ form_data.fcf or '' }}">
+        </label><br>
+        <label><strong>Growth Rate (Years 1-5) %:</strong>
+            <input type="number" name="growth_1_5" step="0.01" required class="beige-input"
+                value="{{ form_data.growth_1_5 or '' }}">
+        </label><br>
+        <label><strong>Growth Rate (Years 6-10) %:</strong>
+            <input type="number" name="growth_6_10" step="0.01" required class="beige-input"
+                value="{{ form_data.growth_6_10 or '' }}">
+        </label><br>
+        <label><strong>Discount Rate %:</strong>
+            <input type="number" name="discount" step="0.01" required class="beige-input"
+                value="{{ form_data.discount or '' }}">
+        </label><br>
+        <label><strong>Terminal Growth Rate %:</strong>
+            <input type="number" name="terminal_growth" step="0.01" required class="beige-input"
+                value="{{ form_data.terminal_growth or '' }}">
+        </label><br>
+        <label><strong>Shares Outstanding (M/B):</strong>
+            <input type="number" name="shares" step="0.01" min="0" required class="beige-input"
+                value="{{ form_data.shares or '' }}">
+        </label><br>
+        <button type="submit" name="action" value="calculate"><strong>Calculate</strong></button>
+        {% if result is not none %}
+        <!-- Hidden fields for saving -->
+        <input type="hidden" name="ticker" value="{{ form_data.ticker }}">
+        <input type="hidden" name="fcf" value="{{ form_data.fcf }}">
+        <input type="hidden" name="growth_1_5" value="{{ form_data.growth_1_5 }}">
+        <input type="hidden" name="growth_6_10" value="{{ form_data.growth_6_10 }}">
+        <input type="hidden" name="discount" value="{{ form_data.discount }}">
+        <input type="hidden" name="terminal_growth" value="{{ form_data.terminal_growth }}">
+        <input type="hidden" name="shares" value="{{ form_data.shares }}">
+        <input type="hidden" name="result" value="{{ result }}"> 
+        <button type="submit" name="action" value="save"><strong>Save Analysis</strong></button>
+        {% endif %}
+    </form>
+
+    {% if result is not none %}
+    <section>
+        <h2>Result</h2>
+        <p>Intrinsic Value per Share: $/€{{ "%.2f"|format(result) }}</p>
+        <!-- Use Yahoo finance API for displaying current value per share-->
+        <p>Current Value per Share: $/€{{ "%.2f"|format(current_price) }}</p>
+        <p>Estimated Upside: {{ "%.2f"|format((result - current_price) / current_price * 100) }}%</p>
+    </section>
+    {% endif %}
+
+    {% if saved_dcfs %}
+    <section style="margin-top:2rem;">
+        <h2>Saved DCF Analyses</h2>
+        <table style="background: #F8F5F0; border-collapse: collapse; width: 100%; max-width: 900px;">
+            <thead
+                style="background: #1E3A34; color: #F8F5F0; font-family: 'Georgia', serif; font-variant: small-caps; font-weight: bold;">
+                <tr>
+                    <th style="padding: 0.5rem;">Ticker</th>
+                    <th style="padding: 0.5rem;">FCF (M/B)</th>
+                    <th style="padding: 0.5rem;">Growth 1-5 (%)</th>
+                    <th style="padding: 0.5rem;">Growth 6-10 (%)</th>
+                    <th style="padding: 0.5rem;">Discount (%)</th>
+                    <th style="padding: 0.5rem;">Terminal Growth (%)</th>
+                    <th style="padding: 0.5rem;">Shares (M/B)</th>
+                    <th style="padding: 0.5rem;">Intrinsic Value ($/€)</th>
+                    <th style="padding: 0.5rem;">Date</th>
+                    <th style="padding: 0.5rem;">Create Report</th>
+                    <th style="padding: 0.5rem;">Actions</th>
+                </tr>
+            </thead>
+            <tbody style="color: #2C2C2C;">
+                {% for dcf in saved_dcfs %}
+                <tr style="border-bottom: 1px solid #D6C6B9;">
+                    <td style="padding: 0.5rem;">{{ dcf.ticker }}</td>
+                    <td style="padding: 0.5rem;">{{ dcf.fcf }}</td>
+                    <td style="padding: 0.5rem;">{{ dcf.growth_1_5 }}</td>
+                    <td style="padding: 0.5rem;">{{ dcf.growth_6_10 }}</td>
+                    <td style="padding: 0.5rem;">{{ dcf.discount }}</td>
+                    <td style="padding: 0.5rem;">{{ dcf.terminal_growth }}</td>
+                    <td style="padding: 0.5rem;">{{ dcf.shares }}</td>
+                    <td style="padding: 0.5rem;">{{ "%.2f"|format(dcf.intrinsic_value) }}</td>
+                    <td style="padding: 0.5rem;">{{ dcf.date }}</td>
+                    <td style="padding: 0.5rem;">
+                        <a href="{{ url_for('reports_page') }}?from_dcf=1&ticker={{ dcf.ticker }}&intrinsic_value={{ dcf.intrinsic_value }}&fcf={{ dcf.fcf }}&growth_1_5={{ dcf.growth_1_5 }}&growth_6_10={{ dcf.growth_6_10 }}&discount={{ dcf.discount }}&terminal_growth={{ dcf.terminal_growth }}&shares={{ dcf.shares }}"
+                            style="color: #1E3A34; text-decoration: underline;">Create Report</a>
+                    </td>
+                    <td style="padding: 0.5rem;">
+                        <a href="{{ url_for('delete_dcf', dcf_id=dcf.id) }}" class="delete-link"
+                            data-ticker="{{ dcf.ticker }}"
+                            style="color: #880D11; text-decoration: underline;">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div id="deleteModal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <span class="modal-close" id="modalClose">&times;</span>
+                <h2>Confirm Deletion</h2>
+                <p id="modalText">Are you sure you want to delete this DCF analysis?</p>
+                <button id="modalCancel" class="modal-btn cancel-btn">Cancel</button>
+                <button id="modalConfirm" class="modal-btn confirm-btn">Delete</button>
+            </div>
+        </div>
+        <script>
+            let deleteLinks = document.querySelectorAll('.delete-link');
+            let modal = document.getElementById('deleteModal');
+            let modalText = document.getElementById('modalText');
+            let modalClose = document.getElementById('modalClose');
+            let modalCancel = document.getElementById('modalCancel');
+            let modalConfirm = document.getElementById('modalConfirm');
+            let deleteUrl = '';
+
+            deleteLinks.forEach(function (link) {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    deleteUrl = this.getAttribute('href');
+                    let ticker = this.getAttribute('data-ticker');
+                    modalText.textContent = `Are you sure you want to delete the DCF analysis for "${ticker}"?`;
+                    modal.style.display = 'flex';
+                });
+            });
+
+            function closeModal() {
+                modal.style.display = 'none';
+                deleteUrl = '';
+            }
+
+            modalClose.onclick = closeModal;
+            modalCancel.onclick = closeModal;
+
+            modalConfirm.onclick = function () {
+                if (deleteUrl) {
+                    window.location.href = deleteUrl;
+                }
+            };
+
+            window.onclick = function (event) {
+                if (event.target == modal) {
+                    closeModal();
+                }
+            };
+        </script>
+    </section>
+    {% endif %}
+    <script>
+        // Auto-dismiss flash messages after 3 seconds and remove them from the DOM
+        setTimeout(function () {
+            document.querySelectorAll('.flashes li').forEach(function (el) {
+                el.classList.add('hide');
+            });
+            setTimeout(function () {
+                var flashes = document.querySelector('.flashes');
+                if (flashes) {
+                    flashes.remove();
+                }
+            }, 600); // Wait for fade-out transition to finish before removing
+        }, 3000);
+    </script>
+
+    <a href="{{ url_for('index') }}" class="back-link" style="
+        display: inline-block;
+        margin: 2rem auto;
+        padding: 0.75rem 1.5rem;
+        background: #1E3A34;
+        color: #F8F5F0;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 4px;
+        font-weight: bold;
+        transition: background 0.3s, transform 0.3s;
+    " onmouseover="this.style.background='#3b5d3a'; this.style.transform='scale(1.02)';"
+        onmouseout="this.style.background='#1E3A34'; this.style.transform='scale(1)'">
+        ← Back to Dashboard
+    </a>
+</body>
+
+</html>

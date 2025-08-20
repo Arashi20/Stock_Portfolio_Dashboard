@@ -1,0 +1,56 @@
+<div id="sidebar" style="
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    width: 60px; /* Collapsed width */
+    height: auto; /* Adjust height to fit content */
+    background: #1E3A34; /* Dark teal */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px; /* Rounded corners */
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 1000;
+    transition: width 0.3s ease, height 0.3s ease;
+">
+    <button id="toggleSidebar" style="
+        background: none;
+        border: none;
+        color: #FFFFFF;
+        font-size: 1.5rem;
+        cursor: pointer;
+        margin-bottom: 0.5rem;
+    ">☰</button>
+    <div id="sidebarContent" style="
+        display: none; /* Hidden when collapsed */
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        padding-left: 0.5rem;
+    ">
+        <a href="{{ url_for('index') }}" style="color: #FFFFFF; text-decoration: none; margin-bottom: 0.5rem; font-weight: bold;">Dashboard</a>
+        <a href="{{ url_for('dcf') }}" style="color: #FFFFFF; text-decoration: none; margin-bottom: 0.5rem;">DCF Calculator</a>
+        <a href="{{ url_for('reports_page') }}" style="color: #FFFFFF; text-decoration: none; margin-bottom: 0.5rem;">Reports</a>
+        <a href="{{ url_for('portfolio_page') }}" style="color: #FFFFFF; text-decoration: none; margin-bottom: 0.5rem;">Portfolio</a>
+        <a href="{{ url_for('wishlist_page') }}" style="color: #FFFFFF; text-decoration: none; margin-bottom: 0.5rem;">Wishlist</a>
+    </div>
+</div>
+
+<script>
+    const sidebar = document.getElementById('sidebar');
+    const toggleButton = document.getElementById('toggleSidebar');
+    const sidebarContent = document.getElementById('sidebarContent');
+
+    toggleButton.addEventListener('click', () => {
+        if (sidebarContent.style.display === 'none') {
+            sidebar.style.width = '200px'; // Expanded width
+            sidebar.style.height = 'auto'; // Adjust height
+            sidebarContent.style.display = 'flex';
+        } else {
+            sidebar.style.width = '60px'; // Collapsed width
+            sidebar.style.height = 'auto'; // Adjust height
+            sidebarContent.style.display = 'none';
+        }
+    });
+</script>

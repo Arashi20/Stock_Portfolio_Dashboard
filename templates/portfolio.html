@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Portfolio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    {% include 'sidebar.html' %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <ul class="flashes">
+        {% for category, message in messages %}
+        <li class="flash-{{ category }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+    <header>
+        <h1>My Portfolio</h1>
+        <p>"It’s not how much money you make, but how much money you keep, how hard it works for you, and how many
+            generations you keep it for." —Robert Kiyosaki</p>
+    </header>
+    <section>
+        <h2>Add New Holding</h2>
+        <form method="post" action="{{ url_for('portfolio_page') }}" class="report-form">
+            <label><strong>Ticker:</strong>
+                <input type="text" name="ticker" required class="beige-input">
+            </label><br>
+            <label><strong>Shares:</strong>
+                <input type="number" name="shares" step="any" min="0" required class="beige-input">
+            </label><br>
+            <label><strong>Average Price:</strong>
+                <input type="number" name="avg_price" step="any" min="0" required class="beige-input">
+            </label><br>
+            <label><strong>Currency:</strong>
+                <select name="currency" required class="beige-input"
+                    style="background: #F8F5F0; border: 1px solid #D6C6B9; color: #2C2C2C;">
+                    <option value="EUR">EUR</option>
+                    <option value="USD">USD</option>
+                </select>
+            </label><br>
+            <button type="submit"><strong>Add Holding</strong></button>
+        </form>
+    </section>
+    <section>
+        <h2>Current Holdings</h2>
+        <div class="portfolio-summary" style="margin-bottom: 1.5rem;">
+            <strong>Total Value (EUR):</strong>
+            <span style="color:#3b5d3a;">
+                €{{ "%.2f"|format(total_value) }}
+            </span>
+            &nbsp;|&nbsp;
+            <strong>Total Gain/Loss (EUR):</strong>
+            <span style="color: {% if total_gain >= 0 %}green{% else %}red{% endif %};">
+                €{{ "%.2f"|format(total_gain) }}
+            </span>
+        </div>
+        <div style="margin-bottom: 1rem;">
+            <input type="text" id="portfolioSearch" class="beige-input" placeholder="Search holdings..."
+                style="width: 250px;">
+        </div>
+        <div style="overflow-x:auto;">
+            <table style="background: #F8F5F0; border-collapse: collapse; width: 100%;">
+                <thead
+                    style="background: #1E3A34; color: #F8F5F0; font-family: 'Georgia', serif; font-variant: small-caps; font-weight: bold;">
+                    <tr>
+                        <th style="padding: 0.5rem;">Ticker</th>
+                        <th style="padding: 0.5rem;">Currency</th>
+                        <th style="padding: 0.5rem;">Shares</th>
+                        <th style="padding: 0.5rem;">Avg. Price</th>
+                        <th style="padding: 0.5rem;">Cost Basis</th>
+                        <th style="padding: 0.5rem;">Current Price</th>
+                        <th style="padding: 0.5rem;">Current Value</th>
+                        <th style="padding: 0.5rem;">Gains/Losses</th>
+                        <th style="padding: 0.5rem;">P/E Ratio</th>
+                        <th style="padding: 0.5rem;">Profit Margin</th>
+                        <th style="padding: 0.5rem;">ROE</th>
+                        <th style="padding: 0.5rem;">Date Added</th>
+                        <th style="padding: 0.5rem;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #2C2C2C;">
+                    {% for holding in holdings %}
+                    <tr style="border-bottom: 1px solid #D6C6B9;">
+                        <td style="padding: 0.5rem;">{{ holding.ticker }}</td>
+                        <td style="padding: 0.5rem;">{{ holding.currency }}</td>
+                        <td style="padding: 0.5rem;">{{ holding.shares }}</td>
+                        <td style="padding: 0.5rem;">{{ holding.avg_price }}</td>
+                        <td style="padding: 0.5rem;">
+                            {% if holding.currency == 'EUR' %}
+                            €{{ "%.2f"|format(holding.shares * holding.avg_price) }}
+                            {% else %}
+                            ${{ "%.2f"|format(holding.shares * holding.avg_price) }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% set price = stock_data.get(holding.ticker, {}).get('current_price') %}
+                            {% if price %}
+                            {% if holding.currency == 'EUR' %}
+                            €{{ "%.2f"|format(price) }}
+                            {% else %}
+                            ${{ "%.2f"|format(price) }}
+                            {% endif %}
+                            {% else %}
+                            N/A
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if price %}
+                            {% if holding.currency == 'EUR' %}
+                            €{{ "%.2f"|format(price * holding.shares) }}
+                            {% else %}
+                            ${{ "%.2f"|format(price * holding.shares) }}
+                            {% endif %}
+                            {% else %}
+                            N/A
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if price %}
+                            {% set gain = (price - holding.avg_price) * holding.shares %}
+                            <span style="color: {% if gain >= 0 %}green{% else %}red{% endif %};">
+                                {% if holding.currency == 'EUR' %}
+                                €{{ "%.2f"|format(gain) }}
+                                {% else %}
+                                ${{ "%.2f"|format(gain) }}
+                                {% endif %}
+                            </span>
+                            {% else %}
+                            N/A
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% set pe = stock_data.get(holding.ticker, {}).get('pe_ratio') %}
+                            {{ "%.2f"|format(pe) if pe else "N/A" }}
+                        </td>
+                        <td>
+                            {% set profit_margin = stock_data.get(holding.ticker, {}).get('profitMargins') %}
+                            {{ "%.2f"|format(profit_margin * 100) ~ "%" if profit_margin else "N/A" }}
+                        </td>
+                        <td>
+                            {% set roe = stock_data.get(holding.ticker, {}).get('roic') %}
+                            {{ "%.2f"|format(roe * 100) ~ "%" if roe else "N/A" }}
+                        </td>
+                        <td>{{ holding.date_added }}</td>
+                        <td>
+                            <a href="{{ url_for('edit_holding', holding_id=holding.id) }}"
+                                style="color: #1E3A34; text-decoration: underline;">Edit</a>
+                            |
+                            <a href="{{ url_for('delete_holding', holding_id=holding.id) }}" class="delete-link"
+                                data-ticker="{{ holding.ticker }}" style="color: #880D11; text-decoration: underline;">Delete</a>
+                        </td>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div style="
+    margin-top: 0.5rem;
+    color: #2e2e1f; /* Primary text color */
+    font-weight: bold;
+    background: #F8F5F0; /* Light beige background */
+    border: 1px solid #b5a77a; /* Muted gold/brown border */
+    border-radius: 6px;
+    padding: 0.4rem 1rem;
+    display: inline-block;
+">
+            Total stocks: {{ holdings|length }}
+        </div>
+    </section>
+
+    <a href="{{ url_for('index') }}" class="back-link" style="
+        display: inline-block;
+        margin: 2rem auto;
+        padding: 0.75rem 1.5rem;
+        background: #1E3A34;
+        color: #F8F5F0;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 4px;
+        font-weight: bold;
+        transition: background 0.3s, transform 0.3s;
+    " onmouseover="this.style.background='#3b5d3a'; this.style.transform='scale(1.02)';"
+        onmouseout="this.style.background='#1E3A34'; this.style.transform='scale(1)'">
+        ← Back to Dashboard
+    </a>
+
+
+    <!-- Delete Modal (single, outside the table) -->
+    <div id="deleteModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="modal-close" id="modalClose">&times;</span>
+            <h2>Confirm Deletion</h2>
+            <p id="modalText">Are you sure you want to delete this holding?</p>
+            <button id="modalCancel" class="modal-btn cancel-btn">Cancel</button>
+            <button id="modalConfirm" class="modal-btn confirm-btn">Delete</button>
+        </div>
+
+        <script>
+            // Auto-dismiss flash messages after 3 seconds and remove them from the DOM
+            setTimeout(function () {
+                document.querySelectorAll('.flashes li').forEach(function (el) {
+                    el.classList.add('hide');
+                });
+                setTimeout(function () {
+                    var flashes = document.querySelector('.flashes');
+                    if (flashes) {
+                        flashes.remove();
+                    }
+                }, 600); // Wait for fade-out transition to finish before removing
+            }, 3000);
+
+            // Custom Delete Modal Logic
+            const deleteLinks = document.querySelectorAll('.delete-link');
+            const modal = document.getElementById('deleteModal');
+            const modalText = document.getElementById('modalText');
+            const modalClose = document.getElementById('modalClose');
+            const modalCancel = document.getElementById('modalCancel');
+            const modalConfirm = document.getElementById('modalConfirm');
+            let deleteUrl = '';
+
+            deleteLinks.forEach(function (link) {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    deleteUrl = this.getAttribute('href');
+                    let ticker = this.getAttribute('data-ticker');
+                    modalText.textContent = `Are you sure you want to delete holding "${ticker}"?`;
+                    modal.style.display = 'flex';
+                });
+            });
+
+            function closeModal() {
+                modal.style.display = 'none';
+                deleteUrl = '';
+            }
+
+            modalClose.onclick = closeModal;
+            modalCancel.onclick = closeModal;
+
+            modalConfirm.onclick = function () {
+                if (deleteUrl) {
+                    window.location.href = deleteUrl;
+                }
+            };
+
+            // Optional: Close modal when clicking outside modal-content
+            window.onclick = function (event) {
+                if (event.target == modal) {
+                    closeModal();
+                }
+            };
+
+
+            //Ensure ticker input is uppercase
+            const tickerInput = document.querySelector('input[name="ticker"]');
+            if (tickerInput) {
+                tickerInput.addEventListener('input', function () {
+                    this.value = this.value.toUpperCase();
+                });
+                // Also enforce on submit in case of copy-paste or autofill
+                const form = tickerInput.closest('form');
+                if (form) {
+                    form.addEventListener('submit', function () {
+                        tickerInput.value = tickerInput.value.toUpperCase();
+                    });
+                }
+            }
+
+            // Search functionality for portfolio table
+            document.getElementById('portfolioSearch').addEventListener('input', function () {
+                const filter = this.value.toUpperCase();
+                const rows = document.querySelectorAll('table tbody tr');
+                rows.forEach(row => {
+                    const text = row.textContent.toUpperCase();
+                    row.style.display = text.includes(filter) ? '' : 'none';
+                });
+            });
+        </script>
+
+</body>
+
+</html>

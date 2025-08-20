@@ -1,0 +1,29 @@
+#Environment variables
+.env
+
+#Windows Junk
+.DS_Store
+
+
+#Database
+instance/
+*.sqlite3
+
+
+#Virtual environments
+venv/
+env/
+.venv/
+
+
+
+#Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+
+
+#Other
+*.sqlite3

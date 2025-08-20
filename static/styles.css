@@ -1,0 +1,368 @@
+/* Background color + Text */
+body {
+  font-family: 'Georgia', serif;
+  background-color: #F8F5F0;
+  /* Light cream */
+  color: #2C2C2C;
+  /* Dark earthy brown */
+  margin: 2rem;
+}
+
+/* Header styles */
+header h1 {
+  text-align: center;
+  margin-bottom: 0.5rem;
+  color: #1E3A34;
+  /* Dark teal */
+  letter-spacing: 1px;
+}
+
+/* Header paragraph (Quote) styles */
+header p {
+  font-style: italic;
+  text-align: center;
+  margin-top: 0.2rem;
+  color: #C1A14A;
+  /* Soft gold */
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+  margin-bottom: 2rem;
+  background: #E6E2D3;
+  /* Soft beige */
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+th {
+  background: #6D8A6D;
+  /* Sage green */
+  color: #FFFFFF;
+  /* White */
+  padding: 0.5rem;
+}
+
+td {
+  padding: 0.5rem;
+  border: 1px solid #B5A77A;
+  /* Muted gold/brown */
+  text-align: left;
+}
+
+/* Sidebar styles */
+#sidebar {
+  background: #1E3A34;
+  /* Dark teal */
+  color: #FFFFFF;
+  /* White */
+}
+
+#sidebar a {
+  color: #FFFFFF;
+  /* White */
+  text-decoration: none;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+#sidebar a:hover {
+  color: #C1A14A;
+  /* Soft gold */
+}
+
+/* Center navigation cards */
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+form label {
+  display: block;
+  margin: 0.5rem 0;
+}
+
+button {
+  background-color: #1E3A34;
+  /* Deep Forest Green */
+  color: #F8F5F0;
+  /* Ivory / Cream for text */
+  border: 1px solid #C1A14A;
+  /* Muted Gold */
+  transition: background 0.2s;
+
+  /* On Hover: dark green + thin gold outline */
+  &:hover {
+    background-color: #152823;
+    border: 1px solid #C1A14A;
+  }
+
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1rem;
+  transition: background 0.2s;
+
+}
+
+.beige-input {
+  background-color: #e6e2d3;
+  border: 1px solid #b5a77a;
+  color: #2e2e1f;
+  padding: 0.3rem 0.5rem;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.report-form {
+  max-width: 600px;
+  margin-bottom: 2rem;
+}
+
+.report-form textarea {
+  width: 98%;
+  min-height: 2.5em;
+  max-height: 6em;
+  resize: none;
+  background-color: #e6e2d3;
+  border: 1px solid #b5a77a;
+  color: #2e2e1f;
+  border-radius: 4px;
+  padding: 0.3rem 0.5rem;
+  font-family: inherit;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.flashes {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+}
+
+.flashes li {
+  background: #6D8A6D;
+  /* Sage green */
+  color: #FFFFFF;
+  /* White */
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+  opacity: 1;
+  transition: opacity 0.5s;
+}
+
+.flashes li.hide {
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(46, 46, 31, 0.4);
+  justify-content: center;
+  align-items: center;
+}
+
+/* Total Value and Gains/Losess section of portfolio */
+.portfolio-summary {
+  font-size: 1.2rem;
+  /* Default size */
+  margin-bottom: 1.5rem;
+}
+
+/* Media query for phone-sized screens */
+@media (max-width: 768px) {
+
+  /* Adjust header quote */
+  header h1 {
+    font-size: 1.2rem;
+    /* Smaller size for phones */
+    margin-bottom: 0.5rem;
+  }
+
+  header p {
+    font-size: 0.8rem;
+    /* Reduce quote size */
+    margin-top: 0.2rem;
+  }
+
+  /* Adjust Total Value and Gains/Losses section */
+  .portfolio-summary {
+    font-size: 0.8rem;
+    /* Reduce font size */
+    margin-bottom: 0.5rem;
+  }
+
+  /* Table adjustments */
+  table {
+    font-size: 0.7rem;
+    /* Reduce table font size */
+  }
+
+  th,
+  td {
+    padding: 0.3rem;
+    /* Reduce padding for table cells */
+  }
+
+  /* Input fields */
+  input,
+  select {
+    font-size: 0.9rem;
+    /* Smaller input font size */
+    padding: 0.5rem;
+    /* Adjust padding */
+  }
+
+  /* Buttons */
+  button {
+    font-size: 0.9rem;
+    /* Smaller button font size */
+    padding: 0.5rem 1rem;
+    /* Adjust padding */
+  }
+
+  /* Back to Dashboard link */
+  .back-link {
+    font-size: 0.9rem;
+    /* Smaller font size */
+    padding: 0.5rem 1rem;
+    /* Adjust padding */
+  }
+}
+
+
+.modal-content {
+  background: #e6e2d3;
+  color: #2e2e1f;
+  border: 2px solid #b5a77a;
+  border-radius: 12px;
+  padding: 32px 28px 24px 28px;
+  min-width: 320px;
+  max-width: 90vw;
+  box-shadow: 0 4px 24px rgba(60, 60, 40, 0.18);
+  text-align: center;
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  right: 18px;
+  top: 12px;
+  font-size: 2rem;
+  color: #b5a77a;
+  cursor: pointer;
+}
+
+.modal-btn {
+  padding: 8px 24px;
+  margin: 16px 8px 0 8px;
+  border: none;
+  border-radius: 6px;
+  font-size: 1.1em;
+  cursor: pointer;
+}
+
+.confirm-btn {
+  background: #880d11;
+  color: #fff;
+}
+
+.cancel-btn {
+  background: #b5a77a;
+  color: #2e2e1f;
+}
+
+input[name="ticker"] {
+  text-transform: uppercase;
+}
+
+/* Backlink styles */
+.back-link {
+  color: #1E3A34;
+  /* Deep Forest Green */
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.back-link:hover {
+  color: #C1A14A;
+  /* Muted Gold */
+}
+
+/* Input field styles */
+input[type="text"],
+input[type="number"],
+select {
+  background-color: #F8F5F0;
+  /* Warm Ivory / Cream */
+  border: 1px solid #D6C6B9;
+  /* Soft Beige */
+  color: #2C2C2C;
+  /* Charcoal Gray */
+  padding: 0.3rem 0.5rem;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+input[type="text"]::placeholder,
+input[type="number"]::placeholder {
+  color: #777777;
+  /* Muted Gray */
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus {
+  background-color: #EDE7E0;
+  /* Beige Tint */
+  border: 1px solid #C1A14A;
+  /* Muted Gold */
+  outline: none;
+}
+
+/* Navigation card styles */
+.nav-card {
+  background: #F7F7F7;
+  /* Off-white */
+  border: 1px solid #C1A14A;
+  /* Navigation link border */
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.nav-card a {
+  color: #2C2C2C;
+  /* Navigation link text */
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.nav-card:hover {
+  background: #EDE7E0;
+  /* Light gray */
+  transform: scale(1.02);
+  /* Slight zoom effect */
+}
+
+.nav-card a:hover {
+  color: #1E3A34;
+  /* Dark teal for hover effect */
+}

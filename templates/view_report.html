@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>View Report</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    {% include 'sidebar.html' %}
+    <header style="text-align: center; margin-bottom: 2rem;">
+        <h1 style="font-size: 1.8rem; word-wrap: break-word; max-width: 1000px; margin: 0 auto; color: #1E3A34;">
+            {{ report.title }}
+        </h1>
+        <p style="color: #2C2C2C; font-size: 1rem; margin-top: 0.5rem;"><strong>Ticker:</strong> {{ report.ticker }}</p>
+        <p style="color: #2C2C2C; font-size: 1rem; margin-top: 0.5rem;"><strong>Date:</strong> {{ report.date }}</p>
+    </header>
+    <section>
+        <h2>Notes/Analysis</h2>
+        <div style="
+        background: #fff;
+        color: #2e2e1f;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        max-width: 1000px;
+        font-size: 1.08rem;
+        line-height: 1.7;
+    ">
+            {{ report.snippet|replace('\n', '<br>')|safe }}
+        </div>
+    </section>
+    <a href="{{ url_for('reports_page') }}" class="back-link" style="
+        display: inline-block;
+        margin: 2rem auto;
+        padding: 0.75rem 1.5rem;
+        background: #1E3A34;
+        color: #F8F5F0;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 4px;
+        font-weight: bold;
+        transition: background 0.3s, transform 0.3s;
+    " onmouseover="this.style.background='#3b5d3a'; this.style.transform='scale(1.02)';"
+        onmouseout="this.style.background='#1E3A34'; this.style.transform='scale(1)'">
+        ← Back to Reports
+    </a>
+</body>
+
+</html>
