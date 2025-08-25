@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, url_for, redirect, flash
+from flask import Flask, render_template, request, url_for, redirect, flash, session, request
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from werkzeug.security import check_password_hash
+from datetime import datetime, timedelta
 import yfinance as yf
 import requests
 import time 
@@ -9,8 +10,25 @@ import os
 # Initialize Flask app and database
 app = Flask(__name__)
 
-#Secret key for session management
-app.secret_key = os.getenv('SECRET_KEY', 'default_secret_key')  
+# Set static folder
+app.static_folder = 'static'
+
+# Set session timeout
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
+
+#Secret key for session management - found in Railway environment variables
+app.secret_key = os.getenv('SECRET_KEY')  
+
+
+#User credentials - Found in Railway environment variables
+USER_CREDENTIALS = {
+    'username': os.getenv('APP_USERNAME'),
+    'password': os.getenv('APP_PASSWORD')
+}
+
+#Check if user credentials are set.
+if USER_CREDENTIALS['username'] is None or USER_CREDENTIALS['password'] is None:
+    raise ValueError("Environment variables APP_USERNAME and APP_PASSWORD must be set!")
 
 #Configuration for Database
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///reports.db')
@@ -26,7 +44,7 @@ class Report(db.Model):
     ticker = db.Column(db.String(10), nullable=False)
     title = db.Column(
         db.String(100), nullable=False)
-    snippet = db.Column(db.Text, nullable=False)
+    snippet = db.Column(db.Text, nullable=False) #Might want to get rid of this later
     date = db.Column(db.String(20), nullable=False)
 
 #DCF model (reports.db)
@@ -73,12 +91,8 @@ def get_usd_eur_rate():
         print("Exchange rate fetch error:", e)
         return 0.92  # fallback to a reasonable default
 
-# Initialize the database
-@app.route('/init-db')
-def init_db():
-    db.create_all()
-    return "Database initialized!"
 
+#Main page
 @app.route('/')
 def index():
     holdings = PortfolioHolding.query.all()
@@ -94,6 +108,35 @@ def index():
             'price': price
         })
     return render_template('index.html', portfolio=portfolio)
+
+#Login page
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        # Validate credentials
+        if username == USER_CREDENTIALS['username'] and password == USER_CREDENTIALS['password']:
+            session['user'] = username
+            session.permanent = True  # Make the session permanent so it uses the timeout defined
+            return redirect(url_for('index'))  # Redirect to the main page after login
+        else:
+            flash('Invalid username or password.', 'danger')
+    return render_template('login.html')  # Render the login page
+
+#Logout Function
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    flash('You have been logged out.', 'success')
+    return redirect(url_for('login'))
+
+
+@app.before_request
+def require_login():
+    # Allow access to static files and the login/logout routes without requiring login
+    if request.endpoint not in ['login', 'logout'] and not request.endpoint.startswith('static') and 'user' not in session:
+        return redirect(url_for('login'))
 
 
 # Portfolio CRUD
@@ -367,4 +410,4 @@ def delete_wishlist(item_id):
 
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=False) #Debug false for production, true for development
