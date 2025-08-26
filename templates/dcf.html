@@ -53,7 +53,8 @@
                 <li><strong>Growth Rates:</strong> Estimate the company’s growth rate for years 1-5 and 6-10 (as
                     percentages).</li>
                 <li><strong>Discount Rate:</strong> Enter your required rate of return (usually 8-12%).</li>
-                <li><strong>Terminal Growth Rate:</strong> Estimate long-term growth after year 10 (usually 2-3%). Make sure it is greater than the terminal growth rate.</li>
+                <li><strong>Terminal Growth Rate:</strong> Estimate long-term growth after year 10 (usually 2-3%). Make
+                    sure it is greater than the terminal growth rate.</li>
                 <li><strong>Shares Outstanding (M/B):</strong> Enter the total shares outstanding in millions or
                     billions. (Must be greater than zero.)</li>
                 <li>Click <strong>Calculate</strong> to see the intrinsic value per share. Click <strong>Save
@@ -106,7 +107,7 @@
         <input type="hidden" name="discount" value="{{ form_data.discount }}">
         <input type="hidden" name="terminal_growth" value="{{ form_data.terminal_growth }}">
         <input type="hidden" name="shares" value="{{ form_data.shares }}">
-        <input type="hidden" name="result" value="{{ result }}"> 
+        <input type="hidden" name="result" value="{{ result }}">
         <button type="submit" name="action" value="save"><strong>Save Analysis</strong></button>
         {% endif %}
     </form>
@@ -116,7 +117,14 @@
         <h2>Result</h2>
         <p>Intrinsic Value per Share: $/€{{ "%.2f"|format(result) }}</p>
         <!-- Use Yahoo finance API for displaying current value per share-->
-        <p>Current Value per Share: $/€{{ "%.2f"|format(current_price) }}</p>
+        <p>Current Value per Share:
+            {% if current_price %}
+            €{{ "%.2f"|format(current_price) }}
+            {% else %}
+            Data not available
+            {% endif %}
+
+        </p>
         <p>Estimated Upside: {{ "%.2f"|format((result - current_price) / current_price * 100) }}%</p>
     </section>
     {% endif %}
