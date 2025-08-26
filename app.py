@@ -81,7 +81,7 @@ class WishlistItem(db.Model):
 
 #Helper Function Exchange Rates
 def get_usd_eur_rate():
-    app_id = os.getenv('OPENEXCHANGE_APP_ID', 'default_app_id')
+    app_id = os.getenv('OPENEXCHANGE_APP_ID')
     url = f"https://openexchangerates.org/api/latest.json?app_id={app_id}&symbols=EUR"
     try:
         response = requests.get(url)
