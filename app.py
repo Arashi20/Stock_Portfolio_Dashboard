@@ -201,23 +201,23 @@ def get_stock_data(tickers):
     data = {}
     tickers_str = " ".join(tickers).upper()
     stocks = yf.Tickers(tickers_str)
-        for ticker in tickers:
-            try:
-                info = stocks.tickers[ticker].info
-                data[ticker] = {
-                    "current_price": info.get("regularMarketPrice"),
-                    "pe_ratio": info.get("trailingPE"),
-                    "roic": info.get("returnOnEquity"),  # Yahoo uses ROE, not ROIC
-                    "profitMargins": info.get("profitMargins"),
-                }
-            except Exception as e:
-                print(f"Error fetching data for {ticker}: {e}")
-                data[ticker] = {
-                    "current_price": None,
-                    "pe_ratio": None,
-                    "roic": None,
-                    "profitMargins": None,
+    for ticker in tickers:
+        try:
+            info = stocks.tickers[ticker].info
+            data[ticker] = {
+                "current_price": info.get("regularMarketPrice"),
+                "pe_ratio": info.get("trailingPE"),
+                "roic": info.get("returnOnEquity"),  # Yahoo uses ROE, not ROIC
+                "profitMargins": info.get("profitMargins"),
             }
+        except Exception as e:
+            print(f"Error fetching data for {ticker}: {e}")
+            data[ticker] = {
+                "current_price": None,
+                "pe_ratio": None,
+                "roic": None,
+                "profitMargins": None,
+        }
     stock_cache[cache_key] = {
         'timestamp': now,
         'data': data
