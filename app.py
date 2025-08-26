@@ -253,7 +253,7 @@ def dcf():
     saved_dcfs = DCFAnalysis.query.order_by(DCFAnalysis.id.desc()).all()
     current_price = None
     if request.method == 'POST':
-        ticker = request.form.get('ticker', '')
+        ticker = request.form.get('ticker', '').upper() 
         fcf = float(request.form.get('fcf', 0))
         growth_1_5 = float(request.form.get('growth_1_5', 0))
         growth_6_10 = float(request.form.get('growth_6_10', 0))
