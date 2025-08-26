@@ -134,10 +134,11 @@ def logout():
 
 @app.before_request
 def require_login():
-    # Allow access to static files and the login/logout routes without requiring login
-    if request.endpoint not in ['login', 'logout'] and not request.endpoint.startswith('static') and 'user' not in session:
+    # Allow access to static files, login/logout routes, and handle NoneType endpoints
+    if request.endpoint is None or request.endpoint in ['login', 'logout'] or request.endpoint.startswith('static'):
+        return
+    if 'user' not in session:
         return redirect(url_for('login'))
-
 
 # Portfolio CRUD
 @app.route('/portfolio', methods=['GET', 'POST'])
