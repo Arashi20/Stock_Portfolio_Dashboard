@@ -90,6 +90,22 @@ def get_usd_eur_rate():
     except Exception as e:
         print("Exchange rate fetch error:", e)
         return 0.92  # fallback to a reasonable default
+    
+#Initialize Database before first reuest - Solve Railway Internal Server Errror on first run.
+def initialize_database():
+    retries = 5  # Number of retries
+    while retries > 0:
+        try:
+            # Test the database connection
+            db.session.execute('SELECT 1')
+            print("Database connection established.")
+            break
+        except Exception as e:
+            print(f"Database connection failed: {e}. Retrying...")
+            retries -= 1
+            time.sleep(2)  # Wait 2 seconds before retrying
+    if retries == 0:
+        raise Exception("Failed to establish database connection after multiple retries.")
 
 
 #Main page
@@ -423,4 +439,5 @@ def delete_wishlist(item_id):
 
 
 if __name__ == '__main__':
+    initialize_database()  # Ensure DB is initialized before first request
     app.run(debug=False) #Debug false for production, true for development
