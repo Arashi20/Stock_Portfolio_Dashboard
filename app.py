@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, url_for, redirect, flash, session, request
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import check_password_hash
 from datetime import datetime, timedelta
 import yfinance as yf
 import requests
@@ -36,6 +35,24 @@ app.config['SQLALCHEMY_BINDS'] = {
     'portfolio': os.getenv('PORTFOLIO_DATABASE_URL', 'sqlite:///portfolio.db')
 }
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Add connection pooling options to handle connection drops
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'pool_size': 5,  # Number of connections to keep in the pool
+    'max_overflow': 10,  # Additional connections beyond pool_size
+    'pool_timeout': 30,  # Timeout in seconds for getting a connection
+    'pool_recycle': 1800,  # Recycle connections after 30 minutes
+    'pool_pre_ping': True,  # Check connections before use
+}
+
+
+# Apply the same options to the portfolio database
+app.config['SQLALCHEMY_BINDS']['portfolio'] = {
+    'url': os.getenv('PORTFOLIO_DATABASE_URL', 'sqlite:///portfolio.db'),
+    'engine_options': app.config['SQLALCHEMY_ENGINE_OPTIONS']
+}
+
+
 db = SQLAlchemy(app)
 
 #Report model (reports.db)
@@ -96,9 +113,11 @@ def initialize_database():
     retries = 5  # Number of retries
     while retries > 0:
         try:
-            # Test the database connection
+            # Test the default database connection
             db.session.execute('SELECT 1')
-            print("Database connection established.")
+            # Test the portfolio database connection
+            db.session.execute('SELECT 1', bind_key='portfolio')
+            print("Database connections established.")
             break
         except Exception as e:
             print(f"Database connection failed: {e}. Retrying...")
