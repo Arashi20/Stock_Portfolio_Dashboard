@@ -46,12 +46,6 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
 }
 
 
-# Apply the same options to the portfolio database
-app.config['SQLALCHEMY_BINDS']['portfolio'] = {
-    'url': os.getenv('PORTFOLIO_DATABASE_URL', 'sqlite:///portfolio.db'),
-    'engine_options': app.config['SQLALCHEMY_ENGINE_OPTIONS']
-}
-
 
 db = SQLAlchemy(app)
 
