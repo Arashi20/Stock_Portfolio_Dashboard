@@ -56,7 +56,14 @@
                 {% if wishlist %}
                 {% for item in wishlist %}
                 <tr style="border-bottom: 1px solid #D6C6B9;">
-                    <td style="padding: 0.5rem;">{{ item.ticker }}</td>
+                    <td style="padding: 0.5rem;">
+                            <a href="https://stock-research-production.up.railway.app/?ticker={{ item.ticker }}" 
+                               target="_blank"
+                               title="Analyze {{ item.ticker }} in MAS App"
+                               style="color: #1E3A34; text-decoration: underline; font-weight: bold;">
+                                {{ item.ticker }}
+                            </a>
+                        </td>
                     <td style="padding: 0.5rem;">
                         {% if item.currency == 'EUR' %}
                         €{{ "%.2f"|format(item.desired_price) }}

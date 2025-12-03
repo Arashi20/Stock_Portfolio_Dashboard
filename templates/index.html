@@ -28,7 +28,14 @@
             <tbody style="color: #2C2C2C;">
                 {% for stock in portfolio %}
                 <tr style="border-bottom: 1px solid #D6C6B9;">
-                    <td style="padding: 0.5rem;">{{ stock.ticker }}</td>
+                    <td style="padding: 0.5rem;">
+                            <a href="https://stock-research-production.up.railway.app/?ticker={{ stock.ticker }}" 
+                               target="_blank" 
+                               title="Analyze {{ stock.ticker }} in MAS App"
+                               style="color: #1E3A34; text-decoration: underline; font-weight: bold;">
+                                {{ stock.ticker }}
+                            </a>
+                        </td>
                     <td style="padding: 0.5rem;">
                         {% if stock.price is not none %}
                         {% if stock.currency == 'EUR' %}
