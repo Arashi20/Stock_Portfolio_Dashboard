@@ -153,7 +153,12 @@
             <tbody style="color: #2C2C2C;">
                 {% for dcf in saved_dcfs %}
                 <tr style="border-bottom: 1px solid #D6C6B9;">
-                    <td style="padding: 0.5rem;">{{ dcf.ticker }}</td>
+                    <td style="padding: 0.5rem;">
+                        <a href="https://finance.yahoo.com/quote/{{ dcf.ticker }}" target="_blank" 
+                           style="color: #1E3A34; text-decoration: underline;">
+                            {{ dcf.ticker }}
+                        </a>
+                    </td>
                     <td style="padding: 0.5rem;">{{ dcf.fcf }}</td>
                     <td style="padding: 0.5rem;">{{ dcf.growth_1_5 }}</td>
                     <td style="padding: 0.5rem;">{{ dcf.growth_6_10 }}</td>

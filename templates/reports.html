@@ -181,7 +181,13 @@
             <tbody>
                 {% for report in reports %}
                 <tr>
-                    <td>{{ report.ticker }}</td>
+                    <!-- Link to Yahoo Finance for Ticker -->
+                    <td>
+                        <a href="https://finance.yahoo.com/quote/{{ report.ticker }}" target="_blank"
+                           style="color: #1E3A34; text-decoration: underline;">
+                            {{ report.ticker }}
+                        </a>
+                    </td>
                     <td>{{ report.title }}</td>
                     <td>{{ report.date }}</td>
                     <td>
