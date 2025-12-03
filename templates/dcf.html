@@ -154,7 +154,8 @@
                 {% for dcf in saved_dcfs %}
                 <tr style="border-bottom: 1px solid #D6C6B9;">
                     <td style="padding: 0.5rem;">
-                        <a href="https://finance.yahoo.com/quote/{{ dcf.ticker }}" target="_blank" 
+                        <a href="https://finance.yahoo.com/quote/{{ dcf.ticker }}" target="_blank"
+                           title="View {{ dcf.ticker }} on Yahoo Finance" 
                            style="color: #1E3A34; text-decoration: underline;">
                             {{ dcf.ticker }}
                         </a>

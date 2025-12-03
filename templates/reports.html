@@ -141,15 +141,30 @@
         </form>
         <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
         <script>
+
+            // Define toolbar options to include the image button
+            // 'image' allows uploading files which are stored as Base64 strings in your DB
+            var toolbarOptions = [
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+                [{ 'align': [] }],
+                ['link', 'image'],                                // Added 'image' here
+                ['clean']                                         // remove formatting button
+            ];
+
             var quill = new Quill('#editor', {
                 theme: 'snow'
             });
 
-            // Prefill Quill editor if DCF data is present
-            var prefillDiv = document.getElementById('prefill-content');
-            if (prefillDiv && prefillDiv.innerHTML.trim().length > 0) {
-                quill.root.innerHTML = prefillDiv.innerHTML;
-            }
+            // Initialize Quill with the custom toolbar module
+            var quill = new Quill('#editor', {
+                modules: {
+                    toolbar: toolbarOptions
+                },
+                theme: 'snow'
+            });
 
             // On form submit, copy HTML to hidden input
             document.querySelector('form').onsubmit = function () {
@@ -184,6 +199,7 @@
                     <!-- Link to Yahoo Finance for Ticker -->
                     <td>
                         <a href="https://finance.yahoo.com/quote/{{ report.ticker }}" target="_blank"
+                           title="View {{ report.ticker }} on Yahoo Finance"
                            style="color: #1E3A34; text-decoration: underline;">
                             {{ report.ticker }}
                         </a>
