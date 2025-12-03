@@ -86,7 +86,14 @@
                 <tbody style="color: #2C2C2C;">
                     {% for holding in holdings %}
                     <tr style="border-bottom: 1px solid #D6C6B9;">
-                        <td style="padding: 0.5rem;">{{ holding.ticker }}</td>
+                        <td style="padding: 0.5rem;">
+                            <a href="https://stock-research-production.up.railway.app/?ticker={{ holding.ticker }}" 
+                               target="_blank"
+                               title="Analyze {{ holding.ticker }} in MAS App"
+                               style="color: #1E3A34; text-decoration: underline; font-weight: bold;">
+                                {{ holding.ticker }}
+                            </a>
+                        </td>
                         <td style="padding: 0.5rem;">{{ holding.currency }}</td>
                         <td style="padding: 0.5rem;">{{ holding.shares }}</td>
                         <td style="padding: 0.5rem;">{{ holding.avg_price }}</td>
